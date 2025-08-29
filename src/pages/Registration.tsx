@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Registration = () => {
     fbName: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.address || !formData.fbName) {
@@ -27,16 +28,40 @@ const Registration = () => {
       return;
     }
 
-    // Store registration data in localStorage
-    localStorage.setItem("registration", JSON.stringify(formData));
-    
-    toast({
-      title: "Registration Complete!",
-      description: "Welcome to the tribal realm. Discover your destiny...",
-    });
+    try {
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from("users")
+        .insert([
+          {
+            name: formData.name,
+            address: formData.address,
+            fb_name: formData.fbName
+          }
+        ])
+        .select()
+        .single();
 
-    // Navigate to tribe page
-    setTimeout(() => navigate("/tribe"), 1500);
+      if (error) throw error;
+
+      // Store user ID in localStorage for tribe assignment
+      localStorage.setItem("currentUserId", data.id);
+      
+      toast({
+        title: "Registration Complete!",
+        description: "Welcome! Ready to discover your tribe?",
+      });
+
+      // Navigate to tribe page
+      setTimeout(() => navigate("/tribe"), 1500);
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration Failed",
+        description: "There was an error saving your information. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -44,18 +69,18 @@ const Registration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-earth flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-soft flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="bg-card/90 backdrop-blur-sm border-border shadow-tribal animate-mystical-float">
+        <Card className="bg-card shadow-large border-border animate-fade-in">
           <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-mystical rounded-full flex items-center justify-center animate-tribal-pulse">
-              <span className="text-2xl">🔮</span>
+            <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center animate-pulse-glow">
+              <span className="text-2xl">✨</span>
             </div>
-            <CardTitle className="text-2xl bg-gradient-mystical bg-clip-text text-transparent">
-              Join the Mystical Realm
+            <CardTitle className="text-2xl bg-gradient-primary bg-clip-text text-transparent">
+              Join Our Community
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Enter your sacred details to discover which tribe calls to your spirit
+              Enter your details to discover which tribe matches your spirit
             </CardDescription>
           </CardHeader>
           
@@ -63,52 +88,51 @@ const Registration = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground font-medium">
-                  Sacred Name
+                  Full Name
                 </Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Your true name..."
+                  placeholder="Enter your full name"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="bg-input border-border focus:ring-primary focus:border-primary transition-smooth"
+                  className="transition-smooth focus:shadow-glow"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="address" className="text-foreground font-medium">
-                  Earthly Dwelling
+                  Address
                 </Label>
                 <Input
                   id="address"
                   type="text"
-                  placeholder="Where your body resides..."
+                  placeholder="Enter your address"
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="bg-input border-border focus:ring-primary focus:border-primary transition-smooth"
+                  className="transition-smooth focus:shadow-glow"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="fbName" className="text-foreground font-medium">
-                  Facebook Identity
+                  Facebook Name
                 </Label>
                 <Input
                   id="fbName"
                   type="text"
-                  placeholder="Your digital persona..."
+                  placeholder="Your Facebook name"
                   value={formData.fbName}
                   onChange={(e) => handleInputChange("fbName", e.target.value)}
-                  className="bg-input border-border focus:ring-primary focus:border-primary transition-smooth"
+                  className="transition-smooth focus:shadow-glow"
                 />
               </div>
 
               <Button 
                 type="submit" 
-                variant="tribal"
-                className="w-full text-lg font-semibold"
+                className="w-full text-lg font-semibold bg-gradient-primary hover:shadow-glow transition-smooth"
               >
-                Begin Your Journey
+                Continue to Tribe Discovery
               </Button>
             </form>
 
@@ -118,7 +142,7 @@ const Registration = () => {
                 onClick={() => navigate("/tribe")}
                 className="text-muted-foreground hover:text-foreground transition-smooth"
               >
-                Skip to Tribe Discovery →
+                Skip Registration →
               </Button>
             </div>
           </CardContent>

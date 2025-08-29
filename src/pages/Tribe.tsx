@@ -1,64 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-const TRIBES = [
-  {
-    name: "Shadow Wolves",
-    element: "Darkness",
-    symbol: "🐺",
-    description: "Masters of stealth and cunning, guardians of the night realm.",
-    color: "from-purple-900 to-gray-900"
-  },
-  {
-    name: "Fire Phoenixes",
-    element: "Fire",
-    symbol: "🔥",
-    description: "Passionate warriors who rise from ashes, keepers of eternal flame.",
-    color: "from-red-600 to-orange-500"
-  },
-  {
-    name: "Earth Guardians",
-    element: "Earth",
-    symbol: "🌿",
-    description: "Wise protectors of nature, healers of the ancient forest.",
-    color: "from-green-700 to-green-500"
-  },
-  {
-    name: "Storm Riders",
-    element: "Air",
-    symbol: "⚡",
-    description: "Swift as lightning, masters of wind and sky.",
-    color: "from-blue-600 to-cyan-400"
-  },
-  {
-    name: "Crystal Seers",
-    element: "Spirit",
-    symbol: "💎",
-    description: "Mystic oracles who see beyond the veil of reality.",
-    color: "from-indigo-600 to-purple-400"
-  },
-  {
-    name: "Ocean Depths",
-    element: "Water",
-    symbol: "🌊",
-    description: "Flowing like tides, keepers of ancient water wisdom.",
-    color: "from-teal-600 to-blue-500"
-  }
-];
+interface Tribe {
+  id: string;
+  name: string;
+  element: string;
+  symbol: string;
+  description: string;
+  color: string;
+}
 
-const Tribe = () => {
+const TribePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedName, setSelectedName] = useState("");
-  const [assignedTribe, setAssignedTribe] = useState<typeof TRIBES[0] | null>(null);
+  const [assignedTribe, setAssignedTribe] = useState<Tribe | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [tribes, setTribes] = useState<Tribe[]>([]);
 
-  const handleTribeAssignment = () => {
+  useEffect(() => {
+    fetchTribes();
+  }, []);
+
+  const fetchTribes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("tribes")
+        .select("*");
+      
+      if (error) throw error;
+      setTribes(data || []);
+    } catch (error) {
+      console.error("Error fetching tribes:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load tribes. Please refresh the page.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleTribeAssignment = async () => {
     if (!selectedName.trim()) {
       toast({
         title: "Name Required",
@@ -68,18 +56,56 @@ const Tribe = () => {
       return;
     }
 
+    if (tribes.length === 0) {
+      toast({
+        title: "No Tribes Available",
+        description: "Please wait for tribes to load.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsRevealing(true);
     
     // Add dramatic pause for the reveal
-    setTimeout(() => {
-      const randomTribe = TRIBES[Math.floor(Math.random() * TRIBES.length)];
-      setAssignedTribe(randomTribe);
-      setIsRevealing(false);
-      
-      toast({
-        title: "Destiny Revealed!",
-        description: `${selectedName} belongs to the ${randomTribe.name}!`,
-      });
+    setTimeout(async () => {
+      try {
+        const randomTribe = tribes[Math.floor(Math.random() * tribes.length)];
+        setAssignedTribe(randomTribe);
+        
+        // Get current user ID from localStorage (if they registered)
+        const currentUserId = localStorage.getItem("currentUserId");
+        
+        // Save the assignment to Supabase
+        const { error } = await supabase
+          .from("tribe_assignments")
+          .insert([
+            {
+              user_id: currentUserId,
+              tribe_id: randomTribe.id,
+              assigned_name: selectedName
+            }
+          ]);
+
+        if (error) {
+          console.error("Error saving tribe assignment:", error);
+        }
+
+        setIsRevealing(false);
+        
+        toast({
+          title: "Tribe Revealed!",
+          description: `${selectedName} belongs to the ${randomTribe.name}!`,
+        });
+      } catch (error) {
+        console.error("Assignment error:", error);
+        setIsRevealing(false);
+        toast({
+          title: "Assignment Failed",
+          description: "There was an error processing the assignment.",
+          variant: "destructive"
+        });
+      }
     }, 2000);
   };
 
@@ -89,28 +115,28 @@ const Tribe = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-earth p-4">
+    <div className="min-h-screen bg-gradient-soft p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-mystical bg-clip-text text-transparent mb-4 animate-mystical-float">
-            Tribal Destiny Revealer
+        <div className="text-center mb-8 animate-fade-in">
+          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4 animate-float">
+            Tribe Discovery
           </h1>
           <p className="text-muted-foreground text-lg">
-            Discover which ancient tribe calls to your spirit
+            Find out which tribe matches your unique spirit
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Assignment Panel */}
-          <Card className="bg-card/90 backdrop-blur-sm border-border shadow-tribal">
+          <Card className="bg-card shadow-large border-border">
             <CardHeader>
               <CardTitle className="text-xl text-center">
-                {assignedTribe ? "Destiny Revealed" : "Seek Your Tribe"}
+                {assignedTribe ? "Tribe Revealed!" : "Discover Your Tribe"}
               </CardTitle>
               <CardDescription className="text-center">
                 {assignedTribe 
-                  ? "The ancient spirits have spoken..." 
-                  : "Enter a name and let the mystical forces decide"
+                  ? "Your tribal destiny has been revealed" 
+                  : "Enter a name to discover which tribe they belong to"
                 }
               </CardDescription>
             </CardHeader>
@@ -120,38 +146,37 @@ const Tribe = () => {
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-foreground font-medium">
-                      Seeker's Name
+                      Name to Discover
                     </Label>
                     <Input
                       id="name"
                       type="text"
-                      placeholder="Enter the name of the seeker..."
+                      placeholder="Enter someone's name..."
                       value={selectedName}
                       onChange={(e) => setSelectedName(e.target.value)}
-                      className="bg-input border-border focus:ring-primary focus:border-primary transition-smooth"
+                      className="transition-smooth focus:shadow-glow"
                       disabled={isRevealing}
                     />
                   </div>
 
                   <Button 
                     onClick={handleTribeAssignment}
-                    disabled={isRevealing}
-                    variant="tribal"
-                    className="w-full text-lg font-semibold"
+                    disabled={isRevealing || tribes.length === 0}
+                    className="w-full text-lg font-semibold bg-gradient-primary hover:shadow-glow transition-smooth"
                   >
                     {isRevealing ? (
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                        Consulting the Spirits...
+                        Revealing Tribe...
                       </div>
                     ) : (
-                      "Reveal Tribal Destiny"
+                      "Discover Tribe"
                     )}
                   </Button>
                 </>
               ) : (
-                <div className="text-center space-y-6">
-                  <div className={`mx-auto w-24 h-24 bg-gradient-to-br ${assignedTribe.color} rounded-full flex items-center justify-center text-4xl animate-tribal-pulse`}>
+                <div className="text-center space-y-6 animate-fade-in">
+                  <div className="mx-auto w-24 h-24 bg-gradient-primary rounded-full flex items-center justify-center text-4xl animate-pulse-glow shadow-glow">
                     {assignedTribe.symbol}
                   </div>
                   
@@ -173,9 +198,9 @@ const Tribe = () => {
                   <Button 
                     onClick={resetAssignment}
                     variant="secondary"
-                    className="w-full"
+                    className="w-full transition-smooth hover:shadow-medium"
                   >
-                    Seek Another Destiny
+                    Discover Another
                   </Button>
                 </div>
               )}
@@ -183,21 +208,21 @@ const Tribe = () => {
           </Card>
 
           {/* Tribes Overview */}
-          <Card className="bg-card/90 backdrop-blur-sm border-border shadow-tribal">
+          <Card className="bg-card shadow-large border-border">
             <CardHeader>
-              <CardTitle className="text-xl text-center">The Six Sacred Tribes</CardTitle>
+              <CardTitle className="text-xl text-center">Available Tribes</CardTitle>
               <CardDescription className="text-center">
-                Each tribe holds ancient power and wisdom
+                Six unique tribes, each with their own special traits
               </CardDescription>
             </CardHeader>
             
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
-                {TRIBES.map((tribe, index) => (
+                {tribes.map((tribe) => (
                   <div 
-                    key={index}
-                    className={`p-3 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-smooth ${
-                      assignedTribe?.name === tribe.name ? 'ring-2 ring-primary bg-primary/10' : ''
+                    key={tribe.id}
+                    className={`p-3 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-smooth hover:shadow-medium ${
+                      assignedTribe?.name === tribe.name ? 'ring-2 ring-primary bg-primary/10 shadow-glow' : ''
                     }`}
                   >
                     <div className="text-center">
@@ -212,6 +237,11 @@ const Tribe = () => {
                   </div>
                 ))}
               </div>
+              {tribes.length === 0 && (
+                <div className="text-center text-muted-foreground py-4">
+                  Loading tribes...
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -222,7 +252,7 @@ const Tribe = () => {
             onClick={() => navigate("/")}
             className="text-muted-foreground hover:text-foreground transition-smooth"
           >
-            ← Return to Registration
+            ← Back to Registration
           </Button>
         </div>
       </div>
@@ -230,4 +260,4 @@ const Tribe = () => {
   );
 };
 
-export default Tribe;
+export default TribePage;

@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      tribe_assignments: {
+        Row: {
+          assigned_name: string
+          created_at: string
+          id: string
+          tribe_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          assigned_name: string
+          created_at?: string
+          id?: string
+          tribe_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          assigned_name?: string
+          created_at?: string
+          id?: string
+          tribe_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tribe_assignments_tribe_id_fkey"
+            columns: ["tribe_id"]
+            isOneToOne: false
+            referencedRelation: "tribes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tribe_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tribes: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          element: string
+          id: string
+          name: string
+          symbol: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          description: string
+          element: string
+          id?: string
+          name: string
+          symbol: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          element?: string
+          id?: string
+          name?: string
+          symbol?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          address: string
+          created_at: string
+          fb_name: string
+          id: string
+          name: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          fb_name: string
+          id?: string
+          name: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          fb_name?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
