@@ -67,23 +67,26 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				success: 'hsl(var(--success))',
-				warning: 'hsl(var(--warning))'
+				warning: 'hsl(var(--warning))',
+				judah: 'hsl(var(--judah))',
+				levi: 'hsl(var(--levi))',
+				reuben: 'hsl(var(--reuben))',
+				simeon: 'hsl(var(--simeon))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
-			backgroundImage: {
-				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-soft': 'var(--gradient-soft)',
-				'gradient-card': 'var(--gradient-card)'
-			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
 				'medium': 'var(--shadow-medium)',
 				'large': 'var(--shadow-large)',
-				'glow': 'var(--shadow-glow)'
+				'glow': 'var(--shadow-glow)',
+				'judah': 'var(--shadow-judah)',
+				'levi': 'var(--shadow-levi)',
+				'reuben': 'var(--shadow-reuben)',
+				'simeon': 'var(--shadow-simeon)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',

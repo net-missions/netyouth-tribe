@@ -42,11 +42,9 @@ CREATE POLICY "Anyone can insert tribes" ON public.tribes FOR INSERT WITH CHECK 
 CREATE POLICY "Anyone can view tribe assignments" ON public.tribe_assignments FOR SELECT USING (true);
 CREATE POLICY "Anyone can insert tribe assignments" ON public.tribe_assignments FOR INSERT WITH CHECK (true);
 
--- Insert the six tribes data
+-- Insert the four tribes data
 INSERT INTO public.tribes (name, element, symbol, description, color) VALUES
-('Shadow Wolves', 'Darkness', '🐺', 'Masters of stealth and cunning, guardians of the night realm.', 'from-purple-900 to-gray-900'),
-('Fire Phoenixes', 'Fire', '🔥', 'Passionate warriors who rise from ashes, keepers of eternal flame.', 'from-red-600 to-orange-500'),
-('Earth Guardians', 'Earth', '🌿', 'Wise protectors of nature, healers of the ancient forest.', 'from-green-700 to-green-500'),
-('Storm Riders', 'Air', '⚡', 'Swift as lightning, masters of wind and sky.', 'from-blue-600 to-cyan-400'),
-('Crystal Seers', 'Spirit', '💎', 'Mystic oracles who see beyond the veil of reality.', 'from-indigo-600 to-purple-400'),
-('Ocean Depths', 'Water', '🌊', 'Flowing like tides, keepers of ancient water wisdom.', 'from-teal-600 to-blue-500');
+('Judah', 'Lion', '🦁', 'Courageous leaders with the heart of a lion, born to rule with wisdom.', 'from-yellow-600 to-orange-500'),
+('Dan', 'Eagle', '🦅', 'Visionary scouts soaring high, seeing what others cannot see.', 'from-blue-600 to-cyan-400'),
+('Ephraim', 'Ox', '🐂', 'Strong and steadfast workers, the backbone of every community.', 'from-green-700 to-green-500'),
+('Reuben', 'Man', '👤', 'Compassionate servants with hearts for humanity and justice.', 'from-purple-600 to-indigo-400');

@@ -6,65 +6,62 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-soft flex items-center justify-center p-4">
-      <div className="max-w-4xl mx-auto text-center">
-        <div className="mb-12 animate-fade-in">
-          <h1 className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6 animate-float">
-            Tribe Discovery
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Welcome to the modern tribe discovery platform. Join our community and find out which of our six unique tribes matches your personality and spirit.
-          </p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="max-w-5xl mx-auto text-center">
+        <div className="mb-16">
+          <h1 className="text-7xl font-bold text-foreground mb-4 tracking-tight">Tribes</h1>
+          <p className="text-xl text-muted-foreground">Find your tribe.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <Card className="bg-card shadow-large border-border hover:shadow-glow transition-smooth group">
+        <div className="grid md:grid-cols-3 gap-8 mb-16 max-w-4xl mx-auto">
+          <Card className="group hover:scale-105 transition-transform duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mb-4 group-hover:animate-pulse-glow">
-                <span className="text-2xl">📝</span>
-              </div>
-              <CardTitle className="text-2xl text-foreground">Join Our Community</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Register with your details to become part of our growing community
-              </CardDescription>
+              <CardTitle className="text-2xl text-foreground">Register</CardTitle>
+              <CardDescription className="text-muted-foreground">Join the community</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
                 onClick={() => navigate("/registration")}
-                className="w-full text-lg font-semibold bg-gradient-primary hover:shadow-glow transition-smooth"
+                className="w-full text-lg font-semibold"
               >
-                Get Started
+                Start
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-card shadow-large border-border hover:shadow-glow transition-smooth group">
+          <Card className="group hover:scale-105 transition-transform duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mb-4 group-hover:animate-pulse-glow">
-                <span className="text-2xl">✨</span>
-              </div>
-              <CardTitle className="text-2xl text-foreground">Discover Tribes</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Jump straight to discovering which tribe someone belongs to
-              </CardDescription>
+              <CardTitle className="text-2xl text-foreground">Discover</CardTitle>
+              <CardDescription className="text-muted-foreground">Find your tribe</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
                 onClick={() => navigate("/tribe")}
                 variant="secondary"
-                className="w-full text-lg font-semibold transition-smooth hover:shadow-medium"
+                className="w-full text-lg font-semibold"
               >
-                Explore Tribes
+                Explore
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:scale-105 transition-transform duration-300">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl text-foreground">Tribe List</CardTitle>
+              <CardDescription className="text-muted-foreground">View all members</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => navigate("/tribe-list")}
+                variant="outline"
+                className="w-full text-lg font-semibold"
+              >
+                View
               </Button>
             </CardContent>
           </Card>
         </div>
-
-        <div className="text-center opacity-75">
-          <p className="text-sm text-muted-foreground italic">
-            "Every person belongs to a tribe. Discover yours today."
-          </p>
-        </div>
+        
       </div>
     </div>
   );

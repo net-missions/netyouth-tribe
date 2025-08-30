@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      inviters: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          status: string | null
+          tribe: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string | null
+          tribe?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string | null
+          tribe?: string | null
+        }
+        Relationships: []
+      }
       tribe_assignments: {
         Row: {
           assigned_name: string
@@ -89,21 +113,30 @@ export type Database = {
           created_at: string
           fb_name: string
           id: string
+          instagram_handle: string | null
+          invited_by: string | null
           name: string
+          status: string | null
         }
         Insert: {
           address: string
           created_at?: string
           fb_name: string
           id?: string
+          instagram_handle?: string | null
+          invited_by?: string | null
           name: string
+          status?: string | null
         }
         Update: {
           address?: string
           created_at?: string
           fb_name?: string
           id?: string
+          instagram_handle?: string | null
+          invited_by?: string | null
           name?: string
+          status?: string | null
         }
         Relationships: []
       }

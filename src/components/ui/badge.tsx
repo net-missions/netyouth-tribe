@@ -15,6 +15,10 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
+        judah: "border-transparent bg-judah/20 text-judah hover:bg-judah/30",
+        levi: "border-transparent bg-levi/20 text-levi hover:bg-levi/30",
+        reuben: "border-transparent bg-reuben/20 text-reuben hover:bg-reuben/30",
+        simeon: "border-transparent bg-simeon/20 text-simeon hover:bg-simeon/30",
       },
     },
     defaultVariants: {

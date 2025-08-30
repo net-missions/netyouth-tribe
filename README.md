@@ -1,5 +1,21 @@
 # Welcome to your Lovable project
 
+## MCP (Model Context Protocol) Supabase Server
+
+Configure the Supabase MCP server via `.mcp.json` and environment variables.
+
+1. Install dependency (already in devDependencies):
+```bash
+npm i -D @supabase/mcp-server-supabase
+```
+2. Set environment variable in your shell profile or `.env`:
+```bash
+export SUPABASE_ACCESS_TOKEN=your_supabase_personal_access_token
+```
+3. The `.mcp.json` is configured to run the server with `npx`.
+
+To generate a Supabase access token, visit your Supabase account settings and create a Personal Access Token with necessary scopes.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/3902a239-430a-4b0a-8b00-bb643dd949e4
