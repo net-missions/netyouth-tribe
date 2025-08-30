@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { getSupabase } from "@/integrations/supabase/client";
 
-interface TribeMember {
+interface TribeAssignment {
   id: string;
-  member_name: string;
-  joined_at: string;
-  status: string;
+  assigned_name: string;
+  created_at: string;
+  user_id: string;
+  tribe_id: string;
 }
 
 interface TribeData {
@@ -17,8 +18,10 @@ interface TribeData {
   name: string;
   color: string;
   description: string;
-  member_count: number;
-  members: TribeMember[];
+  assigned_count: number;
+  total_registrations: number;
+  unassigned_count: number;
+  assignments: TribeAssignment[];
 }
 
 const TribeList = () => {
@@ -48,22 +51,34 @@ const TribeList = () => {
 
       if (tribesError) throw tribesError;
 
-      // Get all tribe members
-      const { data: membersData, error: membersError } = await supabase
-        .from("tribe_members")
+      // Get all tribe assignments
+      const { data: assignmentsData, error: assignmentsError } = await supabase
+        .from("tribe_assignments")
         .select("*")
-        .eq("status", "active")
-        .order("member_name");
+        .order("assigned_name");
 
-      if (membersError) throw membersError;
+      if (assignmentsError) throw assignmentsError;
+
+      // Get total registered users count
+      const { count: totalUsers, error: usersCountError } = await supabase
+        .from("users")
+        .select("*", { count: "exact", head: true });
+
+      if (usersCountError) throw usersCountError;
+
+      // Calculate unassigned count
+      const assignedCount = assignmentsData?.length || 0;
+      const unassignedCount = (totalUsers || 0) - assignedCount;
 
       // Combine data
       const tribesWithMembers = (tribesData || []).map(tribe => {
-        const tribeMembers = (membersData || []).filter(member => member.tribe_id === tribe.id);
+        const tribeAssignments = (assignmentsData || []).filter(assignment => assignment.tribe_id === tribe.id);
         return {
           ...tribe,
-          member_count: tribeMembers.length,
-          members: tribeMembers
+          assigned_count: tribeAssignments.length,
+          total_registrations: totalUsers || 0,
+          unassigned_count: unassignedCount,
+          assignments: tribeAssignments
         };
       });
 
@@ -113,6 +128,22 @@ const TribeList = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground">Tribe Members</h1>
             <p className="text-muted-foreground">View all members organized by tribe</p>
+            {tribes.length > 0 && (
+              <div className="mt-4 flex justify-center gap-8 text-sm">
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-primary">{tribes[0]?.total_registrations || 0}</p>
+                  <p className="text-muted-foreground">Total Registered</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-orange-600">{tribes[0]?.unassigned_count || 0}</p>
+                  <p className="text-muted-foreground">Unassigned</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-green-600">{tribes.reduce((sum, tribe) => sum + tribe.assigned_count, 0)}</p>
+                  <p className="text-muted-foreground">Assigned to Tribes</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
@@ -124,23 +155,23 @@ const TribeList = () => {
                     <CardTitle className="text-xl">{tribe.name}</CardTitle>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Members</p>
-                    <p className="text-2xl font-bold text-primary">{tribe.member_count}</p>
+                    <p className="text-sm text-muted-foreground">Assigned</p>
+                    <p className="text-2xl font-bold text-primary">{tribe.assigned_count}</p>
                   </div>
                 </div>
               </CardHeader>
               
               <CardContent>
-                {tribe.members.length > 0 ? (
+                {tribe.assignments.length > 0 ? (
                   <div className="space-y-2">
-                    {tribe.members.map((member) => (
+                    {tribe.assignments.map((assignment) => (
                       <div 
-                        key={member.id}
+                        key={assignment.id}
                         className="flex items-center justify-between p-3 bg-muted rounded-lg"
                       >
-                        <span className="font-medium">{member.member_name}</span>
+                        <span className="font-medium">{assignment.assigned_name}</span>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(member.joined_at).toLocaleDateString()}
+                          {new Date(assignment.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     ))}

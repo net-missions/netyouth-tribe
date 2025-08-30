@@ -201,6 +201,31 @@ All colors MUST be HSL.
   .animate-pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
   }
+
+  /* Celebration utility elements */
+  .confetti-piece {
+    position: absolute;
+    top: -12px;
+    width: 8px;
+    height: 14px;
+    border-radius: 2px;
+    opacity: 0.95;
+    will-change: transform, opacity;
+    animation-name: confettiFall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+
+  .balloon {
+    position: absolute;
+    bottom: -64px;
+    font-size: 48px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+    will-change: transform, opacity;
+    animation-name: balloonRise;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
 }
 
 @keyframes fadeIn {
@@ -216,4 +241,33 @@ All colors MUST be HSL.
 @keyframes pulseGlow {
   0%, 100% { box-shadow: var(--shadow-glow); }
   50% { box-shadow: 0 0 35px hsl(var(--primary) / 0.4); }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes balloonRise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(12px, -50vh, 0) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-8px, -105vh, 0) scale(1.1);
+    opacity: 0.9;
+  }
 }

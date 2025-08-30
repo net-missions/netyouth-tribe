@@ -111,14 +111,40 @@ const Registration = () => {
         return;
       }
 
+      // Check if user with the same name already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from("users")
+        .select("id, name, fb_name")
+        .eq("name", formData.name.trim())
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking for duplicate user:", checkError);
+        toast({
+          title: "Database Error",
+          description: "There was an error checking for existing users. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (existingUser) {
+        toast({
+          title: "Name Already Registered",
+          description: `A user with the name "${formData.name}" is already registered. Please check if you've already registered or use a different name.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Save user to Supabase
       const { data, error } = await supabase
         .from("users")
         .insert([
           {
-            name: formData.name,
+            name: formData.name.trim(),
             address: formData.address,
-            fb_name: formData.fbName,
+            fb_name: formData.fbName.trim(),
             invited_by: formData.invitedBy || null,
             status: formData.status || 'reserve'
           }
@@ -126,8 +152,18 @@ const Registration = () => {
         .select()
         .single();
 
-      if (error) throw error;
-
+      if (error) {
+        // Check if it's a unique constraint violation
+        if (error.code === '23505' || error.message?.includes('unique')) {
+          toast({
+            title: "Name Already Registered",
+            description: `A user with the name "${formData.name}" is already registered. Please use a different name or check if you've already registered.`,
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
 
       toast({
         title: "Registration Complete!",
@@ -139,13 +175,23 @@ const Registration = () => {
       // Reset form
       setFormData({ name: "", address: "", fbName: "", invitedBy: "", status: "" });
       setShowNewFields(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast({
-        title: "Registration Failed",
-        description: "There was an error saving your information. Please try again.",
-        variant: "destructive"
-      });
+      
+      // Handle specific error types
+      if (error.code === '23505' || error.message?.includes('unique')) {
+        toast({
+          title: "Name Already Registered",
+          description: `A user with the name "${formData.name}" is already registered. Please use a different name.`,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Registration Failed",
+          description: "There was an error saving your information. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
